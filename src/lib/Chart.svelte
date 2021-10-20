@@ -1,31 +1,5 @@
 <script>
-    import {
-        Chart,
-        ArcElement,
-        LineElement,
-        BarElement,
-        PointElement,
-        BarController,
-        BubbleController,
-        DoughnutController,
-        LineController,
-        PieController,
-        PolarAreaController,
-        RadarController,
-        ScatterController,
-        CategoryScale,
-        LinearScale,
-        LogarithmicScale,
-        RadialLinearScale,
-        TimeScale,
-        TimeSeriesScale,
-        Decimation,
-        Filler,
-        Legend,
-        Title,
-        Tooltip,
-        SubTitle
-    } from 'chart.js';
+    import { Chart, registerables } from 'chart.js';
 
     import { WordCloudController, WordElement } from 'chartjs-chart-wordcloud';
 
@@ -36,31 +10,8 @@
     export let height = "150px";
     export let options = {};
 
+    Chart.register(...registerables);
     Chart.register(
-        // ArcElement,
-        LineElement,
-        BarElement,
-        PointElement,
-        BarController,
-        // BubbleController,
-        // DoughnutController,
-        LineController,
-        PieController,
-        // PolarAreaController,
-        RadarController,
-        ScatterController,
-        CategoryScale,
-        LinearScale,
-        // LogarithmicScale,
-        // RadialLinearScale,
-        TimeScale,
-        TimeSeriesScale,
-        Decimation,
-        Filler,
-        Legend,
-        Title,
-        Tooltip,
-        SubTitle,
         WordElement,
         WordCloudController
     );

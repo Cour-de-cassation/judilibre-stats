@@ -102,7 +102,7 @@
 
     const labelDic = {
         '80.87.226.10': 'courdecassation.fr',
-        '185.24.185.49': 'pist.gouv.fr'
+        '185.24.185.49': 'piste.gouv.fr'
     }
 
     const labelize = (s) => {

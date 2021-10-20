@@ -1,0 +1,229 @@
+<script>
+    import Tile from '$lib/dsfr/Tile.svelte';
+    import Chart from '$lib/Chart.svelte';
+
+	const statsTypes = [
+		{ query: "api_requests_number", type: "number" },
+		{ query: "api_requests_date_histogram", type: "line" },
+		{ query: "decision_uniq_number", type: "number" },
+		{ query: "errors_histogram", type: "bar" },
+		{ query: "requests_ip_source", type: "bar" },
+		{ query: "latencty_date_histogram", type: "line" },
+		{ query: "pods_number", type: "number" },
+		{ query: "cpu_date_histogram", type: "line" },
+		{ query: "mem_date_histogram", type: "line" },
+		{ query: "bandwidth_date_histogram", type: "line" },
+		{ query: "top_words", type: "bar", height: "200px", col: 12 }
+	];
+
+	const dateOptions = [
+		{ label: "Dernier jour", start: "now-1d", end: "now", step: "30m"},
+		{ label: "Dernière heure", start: "now-1h", end: "now", step: "2m"},
+		{ label: "Dernière semaine", start: "now-7d", end: "now", step: "12h"},
+		{ label: "Dernier mois", start: "now-30d", end: "now", step: "1d"},
+		{ label: "Depuis le début", start: "2020-01-01T00:00:00", end: "now", step: "1d"},
+	]
+
+    let dateSelected = dateOptions[0];
+
+    const clusterOptions = [
+        { label: "Production", name: "judilibre-scw-prod-par2" },
+        { label: "Secours", name: "judilibre-scw-prod-par1" },
+        { label: "Recette", name: "judilibre-scw-dev-par1" },
+    ]
+
+	let clusterSelected = clusterOptions[0];
+
+    let stats = {};
+
+    let size = 50;
+
+    $: if (dateSelected || clusterSelected) {
+        statsTypes.forEach( (statsType) => {
+    		fetch(
+                new Request(
+                    `https://monitor.judilibre.io/stats?query=${statsType.query}&date_start=${dateSelected.start}&date_end=${dateSelected.end}&date_interval=${dateSelected.step}&cluster=${clusterSelected.name}&size=${size}`,
+                    {
+                        method: 'GET',
+                        referer: 'https://stats.judilibre.io',
+                        mode: 'cors',
+                        referrerPolicy: 'unsafe-url'
+                    }
+                )
+            ).then(
+                (res) => {
+                    if (res.ok) {
+                        return res.json().then( (json) => {
+                            stats[statsType.query] = json[statsType.query];
+                        })
+                    }
+                })
+        });
+    }
+
+    const toChartjsData = (data, name, type, chartType) => {
+        if (type === "time_series") {
+            let c = 0;
+            let series = {};
+            data.forEach(d => {
+                Object.keys(d).forEach(k => {
+                    if (k !== "date") { series[k] = true }
+                });
+            });
+            series = Object.keys(series);
+            const chartjsData = {
+                datasets: series.map(k => {
+                    return {
+                        data: data.map(d => {
+                            if (d[k]) {
+                                return {
+                                    x: new Date(d.date),
+                                    y: d[k]
+                                }
+                            }
+                        }),
+                        label: k,
+                        borderColor: colorSet[c++]
+                    }
+                })
+            };
+            return chartjsData;
+        } else {
+            return {
+                datasets: [{
+                    data: Object.keys(data).map(k => data[k]),
+                    backgroundColor: colorSet[0],
+                    label: name
+                }],
+                labels: Object.keys(data).map(k => labelize(k))
+            }
+        }
+    }
+
+    const labelDic = {
+        '80.87.226.10': 'courdecassation.fr',
+        '185.24.185.49': 'pist.gouv.fr'
+    }
+
+    const labelize = (s) => {
+        return labelDic[s] || s;
+    }
+
+    const chartOptions = {
+        responsive: true,
+        animation: {
+            duration: 0
+        },
+        interaction: {
+            mode: 'index'
+        },
+        hover: {
+            intersect: false
+        },
+        elements: {
+            point:{
+                radius: 0
+            },
+            line: {
+                tension: 0,
+            }
+        }
+    }
+
+  const hexToRgb = (hex) => hexToRgba(hex,255);
+
+  const hexToRgba = (hex, alpha) => 'rgba(' + hex.match(/^\s*\#?([\da-f]{2})([\da-f]{2})([\da-f]{2})\s*$/)
+        .slice(1).map(e => parseInt(e, 16)).join(',') + `,${alpha})`;
+
+  const colorSet = [
+    '#4dc9f6',
+    '#f67019',
+    '#f53794',
+    '#537bc4',
+    '#acc236',
+    '#166a8f',
+    '#00a950',
+    '#58595b',
+    '#8549ba'
+   ]
+
+</script>
+
+<div class="fr-container fr-container--fluid">
+    <div class="fr-grid-row fr-grid-row--gutters">
+        <div class="fr-col-12">
+            <div class="fr-container fr-container--fluid">
+                <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-6">
+                        <label class="fr-label" for="date">
+                            Plage de dates
+                        </label>
+                        <select id="date" class="fr-select" bind:value={dateSelected}>
+                            {#each dateOptions as dateOption}
+                                <option value={dateOption}>
+                                    {dateOption.label}
+                                </option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="fr-col-6">
+                        <label class="fr-label" for="cluster">
+                            Environnement
+                        </label>
+                        <select id="cluster" class="fr-select" bind:value={clusterSelected}>
+                            {#each clusterOptions as clusterOption}
+                                <option value={clusterOption}>
+                                    {clusterOption.label}
+                                </option>
+                            {/each}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fr-col-12">
+            <div class="fr-container fr-container--fluid">
+                <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                    {#each statsTypes.filter(s => s.type === "number").map(s => s.query) as query}
+                        <div class="fr-col-4">
+                            {#if stats[query]}
+                                <Tile>
+                                    <span slot="title">
+                                        {stats[query].data}
+                                    </span>
+                                    <span slot="desc">
+                                        {query}
+                                    </span>
+                                </Tile>
+                            {/if}
+                        </div>
+                    {/each}
+                    {#each statsTypes.filter(s => s.type !== "number") as statsType, i}
+                        <div class="fr-col-{statsType.col || 6}">
+                            <Chart
+                                height={statsType.height || "150px"}
+                                type={statsType.type}
+                                data={stats[statsType.query] && {...toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType)}}
+                                options={{
+                                    plugins: {
+                                        title: {
+                                            display: true,
+                                            text: statsType.query
+                                        },
+                                        legend: {
+                                            display: (stats[statsType.query] && stats[statsType.query].type === "time_series")
+                                        }
+                                    },
+                                    ...(stats[statsType.query] && stats[statsType.query].type === "time_series"
+                                        ? {...chartOptions, scales: { x: { type: "time"} } }
+                                        : chartOptions)
+                                }}
+                            />
+                        </div>
+                    {/each}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

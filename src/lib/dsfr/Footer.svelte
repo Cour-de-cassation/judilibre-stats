@@ -4,8 +4,8 @@
             <div class="fr-footer__brand fr-enlarge-link">
                 <a href="/" title="Retour à l’accueil">
                     <p class="fr-logo" title="république française">
-                        Cour de
-                        <br>cassation
+                        République
+                        <br>Française
                     </p>
                 </a>
             </div>

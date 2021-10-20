@@ -6,13 +6,16 @@
                     <div class="fr-header__brand-top">
                         <div class="fr-header__logo">
                             <p class="fr-logo">
-                                Cour de
-                                <br>cassation
+                                République
+                                <br>Française
                             </p>
+                        </div>
+                        <div class="fr-header__operator">
+                            <img src="/cour-de-cassation.svg" class="fr-responsive-img" style="max-width:9.0625rem;" alt="Cour de cassation" />
                         </div>
                     </div>
                     <div class="fr-header__service">
-                        <a href="/" title="Accueil - [À MODIFIER | Nom du site / service]">
+                        <a href="/" title="Cour de cassation - API Judilibre">
                           <p class="fr-header__service-title">API Judilibre</p>
                         </a>
                         <p class="fr-header__service-tagline">Statistiques de consultation</p>

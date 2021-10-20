@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
+	<title>API Judilibre - statistiques</title>
 </svelte:head>
 
 <section>

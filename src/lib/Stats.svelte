@@ -4,16 +4,16 @@
 
 	const statsTypes = [
 		{ query: "api_requests_number", type: "number" },
-		{ query: "api_requests_date_histogram", type: "line" },
 		{ query: "decision_uniq_number", type: "number" },
-		{ query: "errors_histogram", type: "bar" },
-		{ query: "requests_ip_source", type: "bar" },
-		{ query: "latencty_date_histogram", type: "line", fill: true },
 		{ query: "pods_number", type: "number" },
-		{ query: "cpu_date_histogram", type: "line", fill: true },
-		{ query: "mem_date_histogram", type: "line", fill: true },
-		{ query: "bandwidth_date_histogram", type: "line" },
-		{ query: "top_words", type: "bar", height: "400px", col: 12 }
+		{ query: "api_requests_date_histogram", type: "line", legend: true},
+		{ query: "errors_histogram", type: "bar", legend: false },
+		{ query: "requests_ip_source", type: "pie", legend: true },
+		{ query: "latencty_date_histogram", type: "line", fill: true, legend: true },
+		{ query: "cpu_date_histogram", type: "line", fill: true, legend: true },
+		{ query: "mem_date_histogram", type: "line", fill: true, legend: true },
+		{ query: "bandwidth_date_histogram", type: "line", legend: false},
+		{ query: "top_words", type: "bar", height: "400px", col: 12, legend: false }
 	];
 
     const label = {
@@ -112,7 +112,8 @@
             return {
                 datasets: [{
                     data: Object.keys(data).map(k => data[k]),
-                    backgroundColor: colorSet[0],
+                    backgroundColor: colorSet,
+                    borderWidth: 0,
                     label: label[name]
                 }],
                 labels: Object.keys(data).map(k => labelize(k))
@@ -236,12 +237,15 @@
                                             data={stats[statsType.query] && {...toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType, statsType.fill)}}
                                             options={{
                                                 plugins: {
+                                                    datalabels: {
+                                                        color: '#ffffff'
+                                                    },
                                                     title: {
                                                         display: true,
                                                         text: label[statsType.query]
                                                     },
                                                     legend: {
-                                                        display: (stats[statsType.query] && stats[statsType.query].type === "time_series")
+                                                        display: statsType.legend
                                                     }
                                                 },
                                                 ...(stats[statsType.query] && stats[statsType.query].type === "time_series"

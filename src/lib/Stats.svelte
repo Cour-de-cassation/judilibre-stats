@@ -16,6 +16,20 @@
 		{ query: "top_words", type: "bar", height: "200px", col: 12 }
 	];
 
+    const label = {
+        api_requests_number: "Appels API",
+        api_requests_date_histogram: "Requêtes",
+        decision_uniq_number: "Décisions consultées",
+        errors_histogram: "Erreurs http",
+        requests_ip_source: "Canal d'appel",
+        latencty_date_histogram: "Latence",
+        cpu_date_histogram: "CPU %",
+        mem_date_histogram: "Mémoire",
+        bandwidth_date_histogram: "Réseau (octets)",
+        top_words: "Recherches",
+        pods_number: "Conteneurs"
+    }
+
 	const dateOptions = [
 		{ label: "Dernier jour", start: "now-1d", end: "now", step: "30m"},
 		{ label: "Dernière heure", start: "now-1h", end: "now", step: "2m"},
@@ -46,8 +60,7 @@
                     {
                         method: 'GET',
                         referer: 'https://stats.judilibre.io',
-                        mode: 'cors',
-                        referrerPolicy: 'unsafe-url'
+                        mode: 'cors'
                     }
                 )
             ).then(
@@ -93,7 +106,7 @@
                 datasets: [{
                     data: Object.keys(data).map(k => data[k]),
                     backgroundColor: colorSet[0],
-                    label: name
+                    label: label[name]
                 }],
                 labels: Object.keys(data).map(k => labelize(k))
             }
@@ -192,7 +205,7 @@
                                         {stats[query].data}
                                     </span>
                                     <span slot="desc">
-                                        {query}
+                                        {label[query]}
                                     </span>
                                 </Tile>
                             {/if}
@@ -208,7 +221,7 @@
                                     plugins: {
                                         title: {
                                             display: true,
-                                            text: statsType.query
+                                            text: label[statsType.query]
                                         },
                                         legend: {
                                             display: (stats[statsType.query] && stats[statsType.query].type === "time_series")

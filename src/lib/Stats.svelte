@@ -8,10 +8,10 @@
 		{ query: "decision_uniq_number", type: "number" },
 		{ query: "errors_histogram", type: "bar" },
 		{ query: "requests_ip_source", type: "bar" },
-		{ query: "latencty_date_histogram", type: "line" },
+		{ query: "latencty_date_histogram", type: "line", fill: true },
 		{ query: "pods_number", type: "number" },
-		{ query: "cpu_date_histogram", type: "line" },
-		{ query: "mem_date_histogram", type: "line" },
+		{ query: "cpu_date_histogram", type: "line", fill: true },
+		{ query: "mem_date_histogram", type: "line", fill: true },
 		{ query: "bandwidth_date_histogram", type: "line" },
 		{ query: "top_words", type: "bar", height: "400px", col: 12 }
 	];
@@ -74,7 +74,7 @@
         });
     }
 
-    const toChartjsData = (data, name, type, chartType) => {
+    const toChartjsData = (data, name, type, chartType, fill) => {
         if (type === "time_series") {
             let c = 0;
             let series = {};
@@ -84,6 +84,10 @@
                 });
             });
             series = Object.keys(series);
+            if (series.includes('Mem.total')) {
+                // hack order of series
+                series = ['Mem.used.min', 'Mem.used.mean', 'Mem.used.max', 'Mem.total']
+            }
             const chartjsData = {
                 datasets: series.map(k => {
                     return {
@@ -96,7 +100,10 @@
                             }
                         }),
                         label: k,
-                        borderColor: colorSet[c++]
+                        borderColor: colorSet[c++],
+                        borderWidth: fill ? 0 : undefined,
+                        fill: fill ? 'origin' : undefined,
+                        backgroundColor: fill ? `#000091${9-2*c}${9-2*c}` : undefined
                     }
                 })
             };
@@ -226,7 +233,7 @@
                                         <Chart
                                             height={statsType.height}
                                             type={statsType.type}
-                                            data={stats[statsType.query] && {...toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType)}}
+                                            data={stats[statsType.query] && {...toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType, statsType.fill)}}
                                             options={{
                                                 plugins: {
                                                     title: {

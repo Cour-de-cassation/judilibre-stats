@@ -13,7 +13,7 @@
 		{ query: "cpu_date_histogram", type: "line" },
 		{ query: "mem_date_histogram", type: "line" },
 		{ query: "bandwidth_date_histogram", type: "line" },
-		{ query: "top_words", type: "bar", height: "200px", col: 12 }
+		{ query: "top_words", type: "bar", height: "400px", col: 12 }
 	];
 
     const label = {
@@ -124,6 +124,7 @@
 
     const chartOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         animation: {
             duration: 0
         },
@@ -197,43 +198,55 @@
         <div class="fr-col-12">
             <div class="fr-container fr-container--fluid">
                 <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-                    {#each statsTypes.filter(s => s.type === "number").map(s => s.query) as query}
-                        <div class="fr-col-4">
-                            {#if stats[query]}
-                                <Tile>
-                                    <span slot="title">
-                                        {stats[query].data}
-                                    </span>
-                                    <span slot="desc">
-                                        {label[query]}
-                                    </span>
-                                </Tile>
-                            {/if}
+                    <div class="fr-col-12">
+                        <div class="fr-container fr-container--fluid">
+                            <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                                {#each statsTypes.filter(s => s.type === "number").map(s => s.query) as query}
+                                    <div class="fr-col">
+                                        {#if stats[query]}
+                                            <Tile>
+                                                <span slot="title">
+                                                    {stats[query].data}
+                                                </span>
+                                                <span slot="desc">
+                                                    {label[query]}
+                                                </span>
+                                            </Tile>
+                                        {/if}
+                                    </div>
+                                {/each}
+                            </div>
                         </div>
-                    {/each}
-                    {#each statsTypes.filter(s => s.type !== "number") as statsType, i}
-                        <div class="fr-col-{statsType.col || 6}">
-                            <Chart
-                                height={statsType.height || "150px"}
-                                type={statsType.type}
-                                data={stats[statsType.query] && {...toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType)}}
-                                options={{
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: label[statsType.query]
-                                        },
-                                        legend: {
-                                            display: (stats[statsType.query] && stats[statsType.query].type === "time_series")
-                                        }
-                                    },
-                                    ...(stats[statsType.query] && stats[statsType.query].type === "time_series"
-                                        ? {...chartOptions, scales: { x: { type: "time"} } }
-                                        : chartOptions)
-                                }}
-                            />
+                    </div>
+                    <div class="fr-col-12">
+                        <div class="fr-container fr-container--fluid">
+                            <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                                {#each statsTypes.filter(s => s.type !== "number") as statsType, i}
+                                    <div class="fr-col-12 fr-col-md-{statsType.col || 6}">
+                                        <Chart
+                                            height={statsType.height}
+                                            type={statsType.type}
+                                            data={stats[statsType.query] && {...toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType)}}
+                                            options={{
+                                                plugins: {
+                                                    title: {
+                                                        display: true,
+                                                        text: label[statsType.query]
+                                                    },
+                                                    legend: {
+                                                        display: (stats[statsType.query] && stats[statsType.query].type === "time_series")
+                                                    }
+                                                },
+                                                ...(stats[statsType.query] && stats[statsType.query].type === "time_series"
+                                                    ? {...chartOptions, scales: { x: { type: "time"} } }
+                                                    : chartOptions)
+                                            }}
+                                        />
+                                    </div>
+                                {/each}
+                            </div>
                         </div>
-                    {/each}
+                    </div>
                 </div>
             </div>
         </div>

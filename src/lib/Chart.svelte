@@ -7,7 +7,7 @@
 
     export let type = "line";
     export let data;
-    export let height = "150px";
+    export let height;
     export let options = {};
 
     Chart.register(...registerables);
@@ -39,4 +39,4 @@
     }
 </script>
 
-<canvas style="height: {height}" bind:this={canvas}></canvas>
+<canvas style="height: {height || "250px"}" bind:this={canvas}></canvas>

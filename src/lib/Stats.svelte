@@ -142,6 +142,10 @@
         hover: {
             intersect: false
         },
+        tooltips: {
+          mode: 'nearest',
+          intersect: false,
+        },
         elements: {
             point:{
                 radius: 0

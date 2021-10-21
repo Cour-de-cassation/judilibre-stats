@@ -167,37 +167,37 @@
     <div class="fr-grid-row fr-grid-row--gutters">
         <div class="fr-col-12">
             <div class="fr-container fr-container--fluid">
-                <div class="fr-grid-row fr-grid-row--gutters">
-                    <div class="fr-col-6">
-                        <label class="fr-label" for="date">
-                            Plage de dates
-                        </label>
-                        <select id="date" class="fr-select" bind:value={dateSelected}>
-                            {#each dateOptions as dateOption}
-                                <option value={dateOption}>
-                                    {dateOption.label}
-                                </option>
-                            {/each}
-                        </select>
-                    </div>
-                    <div class="fr-col-6">
-                        <label class="fr-label" for="cluster">
-                            Environnement
-                        </label>
-                        <select id="cluster" class="fr-select" bind:value={clusterSelected}>
-                            {#each clusterOptions as clusterOption}
-                                <option value={clusterOption}>
-                                    {clusterOption.label}
-                                </option>
-                            {/each}
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="fr-col-12">
-            <div class="fr-container fr-container--fluid">
                 <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                    <div class="fr-col-12">
+                        <div class="fr-container fr-container--fluid">
+                            <div class="fr-grid-row fr-grid-row--gutters">
+                                <div class="fr-col-6">
+                                    <label class="fr-label" for="date">
+                                        Plage de dates
+                                    </label>
+                                    <select id="date" class="fr-select" bind:value={dateSelected}>
+                                        {#each dateOptions as dateOption}
+                                            <option value={dateOption}>
+                                                {dateOption.label}
+                                            </option>
+                                        {/each}
+                                    </select>
+                                </div>
+                                <div class="fr-col-6">
+                                    <label class="fr-label" for="cluster">
+                                        Environnement
+                                    </label>
+                                    <select id="cluster" class="fr-select" bind:value={clusterSelected}>
+                                        {#each clusterOptions as clusterOption}
+                                            <option value={clusterOption}>
+                                                {clusterOption.label}
+                                            </option>
+                                        {/each}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="fr-col-12">
                         <div class="fr-container fr-container--fluid">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">

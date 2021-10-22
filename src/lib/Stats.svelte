@@ -147,7 +147,7 @@
                 radius: 0
             },
             line: {
-                tension: 0,
+                tension: 0.15,
             }
         }
     }

@@ -157,17 +157,28 @@
   const hexToRgba = (hex, alpha) => 'rgba(' + hex.match(/^\s*\#?([\da-f]{2})([\da-f]{2})([\da-f]{2})\s*$/)
         .slice(1).map(e => parseInt(e, 16)).join(',') + `,${alpha})`;
 
-  const colorSet = [
-    '#4dc9f6',
-    '#f67019',
-    '#f53794',
-    '#537bc4',
-    '#acc236',
-    '#166a8f',
-    '#00a950',
-    '#58595b',
-    '#8549ba'
-   ]
+  const colorDic = {
+    "F-blue-soft": "#5770BE",
+    "N-orange-dark": "#E18863",
+    "E-green-soft": "#00AC8C",
+    "L-yellow-dark": "#FDCF41",
+    "Q-brown": "#A26859",
+    "J-pink-light": "#FFC29E",
+    "$blue-france": "#000091",
+    "$red-marianne": "#E1000F",
+    "A-green-warm": "#958B62",
+    "B-green-light": "#91AE4F",
+    "C-green-warm": "#169B62",
+    "G-blue-dark": "#484D7A",
+    "H-pink-soft": "#FF8D7E",
+    "I-pink-dark": "#D08A77",
+    "K-yellow-medium": "#FFE800",
+    "M-orange-medium": "#FF9940",
+    "O-orange-soft": "#FF6F4C",
+    "P-purple": "#7D4E5B",
+  };
+
+  const colorSet = Object.keys(colorDic).map(k => colorDic[k]);
 
 </script>
 

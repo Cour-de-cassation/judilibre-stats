@@ -31,9 +31,9 @@
     }
 
 	const dateOptions = [
-		{ label: "Dernier jour", start: "now-1d", end: "now", step: "30m"},
-		{ label: "Dernière heure", start: "now-1h", end: "now", step: "2m"},
-		{ label: "Dernière semaine", start: "now-7d", end: "now", step: "12h"},
+		{ label: "Dernier jour", start: "now-1d", end: "now", step: "1h"},
+		{ label: "Dernière heure", start: "now-1h", end: "now", step: "1m"},
+		{ label: "Dernière semaine", start: "now-7d", end: "now", step: "4h"},
 		{ label: "Dernier mois", start: "now-30d", end: "now", step: "1d"},
 		{ label: "Depuis le début", start: "2020-01-01T00:00:00", end: "now", step: "1d"},
 	]

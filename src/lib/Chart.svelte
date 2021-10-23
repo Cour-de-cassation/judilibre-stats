@@ -1,8 +1,6 @@
 <script>
     import { Chart, registerables } from 'chart.js';
 
-    import { WordCloudController, WordElement } from 'chartjs-chart-wordcloud';
-
     import * as Adapter from "chartjs-adapter-date-fns";
 
     export let type = "line";
@@ -11,10 +9,6 @@
     export let options = {};
 
     Chart.register(...registerables);
-    Chart.register(
-        WordElement,
-        WordCloudController
-    );
     Chart.register(Adapter);
     Chart.defaults.font.family = '"Marianne"';
 

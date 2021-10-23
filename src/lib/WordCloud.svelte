@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from "svelte";
   import { createEventDispatcher } from "svelte";
   import cloud from "d3-cloud";
   import { select } from "d3-selection";
@@ -21,17 +20,16 @@
     schemeTableau10: CS.schemeTableau10,
   };
   // props
-  export let words = [];
+  export let words;
   export let height = 900;
   export let width = 1600;
   export let font = '"Marianne"';
   export let maxFontSize = 30;
   export let scheme = "schemeTableau10";
   export let padding = 4;
+  let prevWords = "";
   // count max word occurence
-  const maxWordCount = words.reduce((prev, cur) =>
-    prev.count < cur.count ? prev.count : cur.count
-  );
+  let maxWordCount;
   // text color scheme
   const fill = scaleOrdinal(color_scheme[scheme]);
   // events
@@ -39,55 +37,64 @@
   const onWordMouserOver = (d) => dispatch("mouseover", d);
   const onWordMouseOut = (d) => dispatch("mouseout", d);
   const onWordMouseMove = (d) => dispatch("mousemove", d);
-  const layout = cloud()
-    .size([width, height])
-    .words(words)
-    .padding(padding)
-    .rotate(() => ~~(Math.random() * 2) * 90)
-    .font(font)
-    .fontSize(
-      (d) =>  Math.floor((d.count / maxWordCount) * maxFontSize)
-    )
-    .on("end", draw);
-  function draw(words) {
+  let layout;
+
+  const draw = (words) => {
     select("#wordcloud")
-      .append("svg")
-      // Responsive SVG needs these 2 attributes and no width and height attr.
-      .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("width", "100%")
-      .attr("height", "100%")
-      // Class to make it responsive.
-      .classed("svg-content-responsive", true)
-      .append("g")
-      .attr(
+        .append("svg")
+        // Responsive SVG needs these 2 attributes and no width and height attr.
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("width", "100%")
+        .attr("height", "100%")
+        // Class to make it responsive.
+        .classed("svg-content-responsive", true)
+        .append("g")
+        .attr(
         "transform",
         "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")"
-      )
-      .selectAll("text")
-      .data(words)
-      .enter()
-      .append("text")
-      .style("font-size", (d) => d.size + "px")
-      .style("font-family", font)
-      .style("fill", (_d, i) => fill(i))
-      .attr("text-anchor", "middle")
-      .attr(
+        )
+        .selectAll("text")
+        .data(words)
+        .enter()
+        .append("text")
+        .style("font-size", (d) => d.size + "px")
+        .style("font-family", font)
+        .style("fill", (_d, i) => fill(i))
+        .attr("text-anchor", "middle")
+        .attr(
         "transform",
         (d) => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"
-      )
-      .text((d) => d.text)
-      .on("click", onWordClick)
-      .on("mouseover", onWordMouserOver)
-      .on("mouseout", onWordMouseOut)
-      .on("mousemove", onWordMouseMove);
+        )
+        .text((d) => d.text)
+        .on("click", onWordClick)
+        .on("mouseover", onWordMouserOver)
+        .on("mouseout", onWordMouseOut)
+        .on("mousemove", onWordMouseMove);
   }
-  // mount
-  onMount(async () => {
+
+  $: if (words && (JSON.stringify(words) !== prevWords)) {
+    if (layout) {
+        select("#wordcloud").select("svg").remove();
+    }
+    prevWords = JSON.stringify(words);
+    maxWordCount = words.reduce((prev, cur) =>
+        prev.count < cur.count ? prev.count : cur.count
+    );
+    layout = cloud()
+        .size([width, height])
+        .words(words)
+        .padding(padding)
+        .rotate(() => ~~(Math.random() * 2) * 90)
+        .font(font)
+        .fontSize(
+        (d) =>  Math.floor((d.count / maxWordCount) * maxFontSize)
+        )
+        .on("end", draw);
     layout.start();
-  });
+  }
 </script>
 
-<div id="wordcloud" style="height: 100%;display: block; margin: auto;"/>
+<div id="wordcloud" style="height: 100%;max-height: 250px;display: block; margin: auto;"/>
 
 <style>
     div#wordcloud {

@@ -123,12 +123,14 @@
     }
 
     const toD3words = (data) => {
-        const words = Object.keys(data).map(word => {
-            return {
-                "text": word,
-                "count": data[word]
-            }
-        })
+        const words = Object.keys(data)
+            .filter(word => word.length>1)
+            .map(word => {
+                return {
+                    "text": word,
+                    "count": data[word]
+                }
+            })
         return words;
     }
 
@@ -252,34 +254,34 @@
                         <div class="fr-container fr-container--fluid">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                                 {#each statsTypes.filter(s => s.type !== "number") as statsType, i}
-                                    <div class="fr-col-12 fr-col-md-6">
-                                        {#if statsType.type !== "wordCloud" }
-                                            <Chart
-                                                height={statsType.height}
-                                                type={statsType.type}
-                                                data={stats[statsType.query] && {...toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType, statsType.fill)}}
-                                                options={{
-                                                    plugins: {
-                                                        datalabels: {
-                                                            color: '#ffffff'
+                                        <div class="fr-col-12 fr-col-md-6">
+                                            {#if statsType.type !== "wordCloud" }
+                                                <Chart
+                                                    height={statsType.height}
+                                                    type={statsType.type}
+                                                    data={stats[statsType.query] && toChartjsData(stats[statsType.query].data, statsType.query, stats[statsType.query].type, statsType.chartType, statsType.fill)}
+                                                    options={{
+                                                        plugins: {
+                                                            datalabels: {
+                                                                color: '#ffffff'
+                                                            },
+                                                            title: {
+                                                                display: true,
+                                                                text: label[statsType.query]
+                                                            },
+                                                            legend: {
+                                                                display: statsType.legend
+                                                            }
                                                         },
-                                                        title: {
-                                                            display: true,
-                                                            text: label[statsType.query]
-                                                        },
-                                                        legend: {
-                                                            display: statsType.legend
-                                                        }
-                                                    },
-                                                    ...(stats[statsType.query] && stats[statsType.query].type === "time_series"
-                                                        ? {...chartOptions, scales: { x: { type: "time"} } }
-                                                        : chartOptions)
-                                                }}
-                                            />
-                                        {:else if (stats[statsType.query])}
-                                            <WordCloud words={toD3words(stats[statsType.query].data)}/>
-                                        {/if}
-                                    </div>
+                                                        ...(stats[statsType.query] && stats[statsType.query].type === "time_series"
+                                                            ? {...chartOptions, scales: { x: { type: "time"} } }
+                                                            : chartOptions)
+                                                    }}
+                                                />
+                                            {:else}
+                                                <WordCloud words={stats[statsType.query] && toD3words(stats[statsType.query].data)}/>
+                                            {/if}
+                                        </div>
                                 {/each}
                             </div>
                         </div>

@@ -22,20 +22,22 @@
 	let chart;
 	let ctx;
 
-	function initChart() {
+	function updateChart() {
 		ctx = canvas.getContext("2d");
         if (chart) {
-            chart.destroy()
+            chart.data = data;
+            chart.update();
+        } else {
+            chart = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: options
+            });
         }
-		chart = new Chart(ctx, {
-			type: type,
-			data: data,
-			options: options
-		});
 	}
 
     $: if (data) {
-        initChart();
+        updateChart();
     }
 </script>
 

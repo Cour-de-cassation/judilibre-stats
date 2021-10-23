@@ -27,6 +27,7 @@
   export let maxFontSize = 30;
   export let scheme = "schemeTableau10";
   export let padding = 4;
+  let maxSize = 1;
   let prevWords = "";
   // count max word occurence
   let maxWordCount;
@@ -58,6 +59,7 @@
         .enter()
         .append("text")
         .style("font-size", (d) => d.size + "px")
+        .style("font-weight", (d) => (d.size * 800 / maxSize))
         .style("font-family", font)
         .style("fill", (_d, i) => fill(i))
         .attr("text-anchor", "middle")
@@ -87,7 +89,11 @@
         .rotate(() => ~~(Math.random() * 2) * 90)
         .font(font)
         .fontSize(
-        (d) =>  Math.floor((d.count / maxWordCount) * maxFontSize)
+            (d) =>  {
+                const size = Math.floor((d.count / maxWordCount) * maxFontSize)
+                maxSize = Math.max(maxSize, size);
+                return size;
+            }
         )
         .on("end", draw);
     layout.start();

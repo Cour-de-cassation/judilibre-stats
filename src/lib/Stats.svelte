@@ -2,6 +2,7 @@
     import Tile from '$lib/dsfr/Tile.svelte';
     import Chart from '$lib/Chart.svelte';
     import WordCloud from '$lib/WordCloud.svelte';
+    import Loader from '$lib/Loader.svelte';
 
 	const statsTypes = [
 		{ query: "api_requests_number", type: "number" },
@@ -39,7 +40,6 @@
 		{ label: "Depuis le début", start: "2020-01-01T00:00:00", end: "now", step: "1d"},
 	]
 
-    let dateSelected = dateOptions[0];
 
     const clusterOptions = [
         { label: "Production", name: "judilibre-scw-prod-par2" },
@@ -47,14 +47,18 @@
         { label: "Recette", name: "judilibre-scw-dev-par1" },
     ]
 
+    let dateSelected = dateOptions[0];
 	let clusterSelected = clusterOptions[0];
 
     let stats = {};
+
+    let isLoading = {};
 
     let size = 50;
 
     $: if (dateSelected || clusterSelected) {
         statsTypes.forEach( (statsType) => {
+            isLoading[statsType.query] = true;
     		fetch(
                 new Request(
                     `https://monitor.judilibre.io/stats?query=${statsType.query}&date_start=${dateSelected.start}&date_end=${dateSelected.end}&date_interval=${dateSelected.step}&cluster=${clusterSelected.name}&size=${size}`,
@@ -69,6 +73,7 @@
                     if (res.ok) {
                         return res.json().then( (json) => {
                             stats[statsType.query] = json[statsType.query];
+                            isLoading[statsType.query] = false;
                         })
                     }
                 })
@@ -234,7 +239,9 @@
                         <div class="fr-container fr-container--fluid">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                                 {#each statsTypes.filter(s => s.type === "number").map(s => s.query) as query}
-                                    <div class="fr-col">
+                                    <div class="fr-col loader-parent">
+                                        <Loader show={isLoading[query] && stats[query]}/>
+
                                         {#if stats[query]}
                                             <Tile>
                                                 <span slot="title">
@@ -254,7 +261,8 @@
                         <div class="fr-container fr-container--fluid">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                                 {#each statsTypes.filter(s => s.type !== "number") as statsType, i}
-                                        <div class="fr-col-12 fr-col-md-6">
+                                        <div class="fr-col-12 fr-col-md-6 loader-parent">
+                                            <Loader show={isLoading[statsType.query] && stats[statsType.query]}/>
                                             {#if statsType.type !== "wordCloud" }
                                                 <Chart
                                                     height={statsType.height}
@@ -291,4 +299,3 @@
         </div>
     </div>
 </div>
-

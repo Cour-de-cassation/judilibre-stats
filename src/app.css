@@ -2,3 +2,6 @@
 
 /* Write your global styles here, in PostCSS syntax */
 
+.loader-parent {
+	position: relative;
+}

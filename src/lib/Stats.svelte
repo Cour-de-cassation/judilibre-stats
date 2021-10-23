@@ -54,7 +54,7 @@
 
     let isLoading = {};
 
-    let size = 50;
+    let size = 30;
 
     $: if (dateSelected || clusterSelected) {
         statsTypes.forEach( (statsType) => {

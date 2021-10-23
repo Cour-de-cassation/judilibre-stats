@@ -4,8 +4,7 @@
 
 
 <div
-  class="load-container"
-  class:load-backround={show}
+  class:load-container={show}
 >
   {#if show}
     <div class="load-content">
@@ -21,9 +20,6 @@
   position: absolute;
   width: 100%;
   height: 100%;
-}
-
-.load-backround {
   backdrop-filter: grayscale(70%) blur(1px) brightness(120%);
 }
 

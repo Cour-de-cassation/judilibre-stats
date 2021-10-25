@@ -5,25 +5,31 @@
     import Loader from '$lib/Loader.svelte';
 
 	const statsTypes = [
+		{ query: "total_docs", type: "number" },
+		{ query: "last_decision_date", type: "date" },
 		{ query: "api_requests_number", type: "number" },
 		{ query: "decision_uniq_number", type: "number" },
 		{ query: "pods_number", type: "number" },
 		{ query: "api_requests_date_histogram", type: "line", legend: true},
 		{ query: "top_words", type: "wordCloud", height: "400px", col: 12, legend: false },
 		{ query: "requests_ip_source", type: "pie", legend: true },
+		{ query: "piste", type: "bar", legend: false },
+		{ query: "errors_histogram", type: "bar", indexAxis: 'y', legend: false },
 		{ query: "latencty_date_histogram", type: "line", fill: true, legend: true },
-		{ query: "errors_histogram", type: "bar", legend: false },
 		{ query: "cpu_date_histogram", type: "line", fill: true, legend: true },
 		{ query: "mem_date_histogram", type: "line", fill: true, legend: true },
 		{ query: "bandwidth_date_histogram", type: "line", legend: false}
 	];
 
     const label = {
+        total_docs: "Décisions indexées",
+        last_decision_date: "Date de la dernière décision",
         api_requests_number: "Appels API",
         api_requests_date_histogram: "Requêtes",
         decision_uniq_number: "Décisions consultées",
         errors_histogram: "Erreurs http",
         requests_ip_source: "Canal d'appel",
+        piste: "Utilisateurs Piste",
         latencty_date_histogram: "Latence",
         cpu_date_histogram: "CPU %",
         mem_date_histogram: "Mémoire",
@@ -41,14 +47,14 @@
 	]
 
 
-    const clusterOptions = [
-        { label: "Production", name: "judilibre-scw-prod-par2" },
-        { label: "Secours", name: "judilibre-scw-prod-par1" },
-        { label: "Recette", name: "judilibre-scw-dev-par1" },
+    const envOptions = [
+        { label: "Production", name: "production" },
+        { label: "Secours", name: "secours" },
+        { label: "Recette", name: "recette" },
     ]
 
     let dateSelected = dateOptions[0];
-	let clusterSelected = clusterOptions[0];
+	let envSelected = envOptions[0];
 
     let stats = {};
 
@@ -56,12 +62,12 @@
 
     let size = 30;
 
-    $: if (dateSelected || clusterSelected) {
+    $: if (dateSelected || envSelected) {
         statsTypes.forEach( (statsType) => {
             isLoading[statsType.query] = true;
     		fetch(
                 new Request(
-                    `https://monitor.judilibre.io/stats?query=${statsType.query}&date_start=${dateSelected.start}&date_end=${dateSelected.end}&date_interval=${dateSelected.step}&cluster=${clusterSelected.name}&size=${size}`,
+                    `https://monitor.judilibre.io/stats?query=${statsType.query}&date_start=${dateSelected.start}&date_end=${dateSelected.end}&date_interval=${dateSelected.step}&env=${envSelected.name}&size=${size}`,
                     {
                         method: 'GET',
                         referer: 'https://stats.judilibre.io',
@@ -115,14 +121,15 @@
             };
             return chartjsData;
         } else {
+            let sortedKeys = Object.keys(data).sort((a,b) => { return data[b] - data[a] })
             return {
                 datasets: [{
-                    data: Object.keys(data).map(k => data[k]),
+                    data: sortedKeys.map(k => data[k]),
                     backgroundColor: colorSet,
                     borderWidth: 0,
                     label: label[name]
                 }],
-                labels: Object.keys(data).map(k => labelize(k))
+                labels: sortedKeys.map(k => labelize(k))
             }
         }
     }
@@ -221,13 +228,13 @@
                                     </select>
                                 </div>
                                 <div class="fr-col-6">
-                                    <label class="fr-label" for="cluster">
+                                    <label class="fr-label" for="env">
                                         Environnement
                                     </label>
-                                    <select id="cluster" class="fr-select" bind:value={clusterSelected}>
-                                        {#each clusterOptions as clusterOption}
-                                            <option value={clusterOption}>
-                                                {clusterOption.label}
+                                    <select id="env" class="fr-select" bind:value={envSelected}>
+                                        {#each envOptions as envOption}
+                                            <option value={envOption}>
+                                                {envOption.label}
                                             </option>
                                         {/each}
                                     </select>
@@ -238,17 +245,19 @@
                     <div class="fr-col-12">
                         <div class="fr-container fr-container--fluid">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-                                {#each statsTypes.filter(s => s.type === "number").map(s => s.query) as query}
+                                {#each statsTypes.filter(s => ['number','date'].includes(s.type)) as statsType, i}
                                     <div class="fr-col loader-parent">
-                                        <Loader show={isLoading[query] && stats[query]}/>
+                                        <Loader show={isLoading[statsType.query] && stats[statsType.query]}/>
 
-                                        {#if stats[query]}
+                                        {#if stats[statsType.query]}
                                             <Tile>
                                                 <span slot="title">
-                                                    {stats[query].data}
+                                                    {statsType.type === "number" ?
+                                                        stats[statsType.query].data
+                                                        : stats[statsType.query].data.replace(/(....)-(..)-(..)/,'$3/$2/$1')}
                                                 </span>
                                                 <span slot="desc">
-                                                    {label[query]}
+                                                    {label[statsType.query]}
                                                 </span>
                                             </Tile>
                                         {/if}
@@ -260,7 +269,7 @@
                     <div class="fr-col-12">
                         <div class="fr-container fr-container--fluid">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-                                {#each statsTypes.filter(s => s.type !== "number") as statsType, i}
+                                {#each statsTypes.filter(s => !['number','date'].includes(s.type)) as statsType, i}
                                         <div class="fr-col-12 fr-col-md-6 loader-parent">
                                             <Loader show={isLoading[statsType.query] && stats[statsType.query]}/>
                                             {#if statsType.type !== "wordCloud" }
@@ -282,8 +291,8 @@
                                                             }
                                                         },
                                                         ...(stats[statsType.query] && stats[statsType.query].type === "time_series"
-                                                            ? {...chartOptions, scales: { x: { type: "time"} } }
-                                                            : chartOptions)
+                                                            ? {...chartOptions, scales: { x: { type: "time"} } }
+                                                            : {...chartOptions, indexAxis: statsType.indexAxis || 'x' })
                                                     }}
                                                 />
                                             {:else}

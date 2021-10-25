@@ -24,9 +24,10 @@
   export let height = 900;
   export let width = 1600;
   export let font = '"Marianne"';
-  export let maxFontSize = 30;
+  export let maxFontSize = 250;
   export let scheme = "schemeTableau10";
   export let padding = 4;
+  let inactive = false;
   let maxSize = 1;
   let prevWords = "";
   // count max word occurence
@@ -59,7 +60,7 @@
         .enter()
         .append("text")
         .style("font-size", (d) => d.size + "px")
-        .style("font-weight", (d) => (d.size * 800 / maxSize))
+        .style("font-weight", (d) => (Math.min(800, d.size * 800 / maxSize)))
         .style("font-family", font)
         .style("fill", (_d, i) => fill(i))
         .attr("text-anchor", "middle")
@@ -75,36 +76,53 @@
   }
 
   $: if (words && (JSON.stringify(words) !== prevWords)) {
-    if (layout) {
-        select("#wordcloud").select("svg").remove();
+    if (words.length) {
+        console.log(words);
+        inactive = false;
+        if (layout) {
+            select("#wordcloud").select("svg").remove();
+        }
+        prevWords = JSON.stringify(words);
+        maxWordCount = Math.max(...words.map(d => d.count),0);
+        layout = cloud()
+            .size([width, height])
+            .words(words)
+            .padding(padding)
+            .rotate(() => ~~(Math.random() * 2) * 90)
+            .font(font)
+            .fontSize(
+                (d) =>  {
+                    const size = Math.floor((d.count / maxWordCount) * maxFontSize) + 1;
+                    maxSize = Math.max(maxSize, size);
+                    return size;
+                }
+            )
+            .on("end", draw);
+        layout.start();
+    } else {
+        prevWords = JSON.stringify(words);
+        inactive = true;
     }
-    prevWords = JSON.stringify(words);
-    maxWordCount = words.reduce((prev, cur) =>
-        prev.count < cur.count ? prev.count : cur.count
-    );
-    layout = cloud()
-        .size([width, height])
-        .words(words)
-        .padding(padding)
-        .rotate(() => ~~(Math.random() * 2) * 90)
-        .font(font)
-        .fontSize(
-            (d) =>  {
-                const size = Math.floor((d.count / maxWordCount) * maxFontSize)
-                maxSize = Math.max(maxSize, size);
-                return size;
-            }
-        )
-        .on("end", draw);
-    layout.start();
   }
 </script>
 
-<div id="wordcloud" style="height: 100%;max-height: 250px;display: block; margin: auto;"/>
+<div id="wordcloud" class:inactive={inactive} style="height: 100%;max-height: 250px;display: block; margin: auto;">
+    {#if (words && words.length === 0)}
+        (pas de requête)
+    {/if}
+</div>
 
 <style>
     div#wordcloud {
         width: fit-content;
         height: fit-content;
+    }
+
+    .inactive {
+        -webkit-filter: grayscale(70%) blur(2px) brightness(120%);
+        -moz-filter: grayscale(70%) blur(2px) brightness(120%);
+        -ms-filter: grayscale(70%) blur(2px) brightness(120%);
+        -o-filter: grayscale(70%) blur(2px) brightness(120%);
+        filter: grayscale(70%) blur(2px) brightness(120%);
     }
 </style>

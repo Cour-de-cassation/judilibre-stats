@@ -60,9 +60,13 @@
 
     let isLoading = {};
 
-    let size = 30;
+    let size = 50;
 
     $: if (dateSelected || envSelected) {
+        fetchData();
+    }
+
+    const fetchData = () => {
         statsTypes.forEach( (statsType) => {
             isLoading[statsType.query] = true;
     		fetch(
@@ -135,15 +139,14 @@
     }
 
     const toD3words = (data) => {
-        const words = Object.keys(data)
-            .filter(word => word.length>1)
+        return Object.keys(data)
+            .filter(word => ((word.length>1)&&(word !== "chien")))
             .map(word => {
                 return {
                     "text": word,
                     "count": data[word]
                 }
             })
-        return words;
     }
 
     const labelDic = {

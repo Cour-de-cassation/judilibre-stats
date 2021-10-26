@@ -25,13 +25,12 @@
   export let width = 1600;
   export let font = '"Marianne"';
   export let maxFontSize = 250;
+  export let maxWeight = 800;
   export let scheme = "schemeTableau10";
   export let padding = 4;
   let inactive = false;
   let maxSize = 1;
   let prevWords = "";
-  // count max word occurence
-  let maxWordCount;
   // text color scheme
   const fill = scaleOrdinal(color_scheme[scheme]);
   // events
@@ -41,7 +40,7 @@
   const onWordMouseMove = (d) => dispatch("mousemove", d);
   let layout;
 
-  const draw = (words) => {
+  const draw = (w) => {
     select("#wordcloud")
         .append("svg")
         // Responsive SVG needs these 2 attributes and no width and height attr.
@@ -56,11 +55,11 @@
         "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")"
         )
         .selectAll("text")
-        .data(words)
+        .data(w)
         .enter()
         .append("text")
         .style("font-size", (d) => d.size + "px")
-        .style("font-weight", (d) => (Math.min(800, d.size * 800 / maxSize)))
+        .style("font-weight", (d) => d.weight)
         .style("font-family", font)
         .style("fill", (_d, i) => fill(i))
         .attr("text-anchor", "middle")
@@ -75,34 +74,34 @@
         .on("mousemove", onWordMouseMove);
   }
 
-  $: if (words && (JSON.stringify(words) !== prevWords)) {
-    if (words.length) {
-        console.log(words);
+  const handleNewWords = () => {
+      if (words.length) {
         inactive = false;
         if (layout) {
             select("#wordcloud").select("svg").remove();
         }
         prevWords = JSON.stringify(words);
-        maxWordCount = Math.max(...words.map(d => d.count),0);
+        const sortedWords = words.sort((a,b) => b.count - a.count);
+        const maxWordCount = sortedWords[0].count;
+        const maxFontSizeApplied = maxFontSize * 10 /  sortedWords[0].text.length;
         layout = cloud()
             .size([width, height])
-            .words(words)
+            .words(sortedWords)
             .padding(padding)
-            .rotate(() => ~~(Math.random() * 2) * 90)
+            .rotate((d) => d.text.length > 20 ? 0 : ~~(Math.random() * 2) * 90)
             .font(font)
-            .fontSize(
-                (d) =>  {
-                    const size = Math.floor((d.count / maxWordCount) * maxFontSize) + 1;
-                    maxSize = Math.max(maxSize, size);
-                    return size;
-                }
-            )
+            .fontSize((d) =>  Math.floor(( Math.log(d.count+1) ** 1.5 / Math.log(maxWordCount+1) ** 1.5 ) * maxFontSizeApplied))
+            .fontWeight((d) => Math.floor((d.count / maxWordCount) * maxWeight))
             .on("end", draw);
         layout.start();
     } else {
         prevWords = JSON.stringify(words);
         inactive = true;
     }
+  }
+
+  $: if (words && (JSON.stringify(words) !== prevWords)) {
+    handleNewWords()
   }
 </script>
 

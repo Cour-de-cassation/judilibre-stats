@@ -1,21 +1,26 @@
 <script>
   export let show = false;
+  export let fulldiv = true;
 </script>
 
 
 <div
-  class:load-container={show}
+  class:fulldiv-container={show && fulldiv}
 >
   {#if show}
-    <div class="load-content">
-      <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-    </div>
+    {#if fulldiv}
+      <div class="load-content">
+        <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    {:else}
+      <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    {/if}
   {/if}
 </div>
 
 <style>
 
-.load-container{
+.fulldiv-container{
   z-index: 1150;
   position: absolute;
   width: 100%;
@@ -107,5 +112,62 @@
     opacity: 0;
   }
 }
+
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 46px;
+  height: 10px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 0px;
+  width: 6px;
+  height: 6px;
+  border-radius: 100%;
+  background: #222;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 2px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 2px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 22px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 38px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(16px, 0);
+  }
+}
+
 
 </style>

@@ -250,20 +250,20 @@
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                                 {#each statsTypes.filter(s => ['number','date'].includes(s.type)) as statsType, i}
                                     <div class="fr-col loader-parent">
-                                        <Loader show={isLoading[statsType.query] && stats[statsType.query]}/>
-
-                                        {#if stats[statsType.query]}
-                                            <Tile>
-                                                <span slot="title">
+                                        <Tile>
+                                            <span slot="title">
+                                                {#if (stats[statsType.query] && !isLoading[statsType.query])}
                                                     {statsType.type === "number" ?
                                                         stats[statsType.query].data
                                                         : stats[statsType.query].data.replace(/(....)-(..)-(..)/,'$3/$2/$1')}
-                                                </span>
-                                                <span slot="desc">
-                                                    {label[statsType.query]}
-                                                </span>
-                                            </Tile>
-                                        {/if}
+                                                {:else}
+                                                    <Loader show={isLoading[statsType.query]} fulldiv={false}/>
+                                                {/if}
+                                            </span>
+                                            <span slot="desc">
+                                                {label[statsType.query]}
+                                            </span>
+                                        </Tile>
                                     </div>
                                 {/each}
                             </div>

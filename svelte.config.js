@@ -9,8 +9,12 @@ const config = {
 		adapter: static_adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: null
+			fallback: 'index.html'
 		}),
+		prerender: {
+			enabled: false
+		},
+		ssr: false,
 		vite: {
 			ssr: {
 				noExternal: ['chart.js']

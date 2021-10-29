@@ -3,6 +3,19 @@
     import Chart from '$lib/Chart.svelte';
     import WordCloud from '$lib/WordCloud.svelte';
     import Loader from '$lib/Loader.svelte';
+    import { DEFAULT_ENV, DEFAULT_SINCE } from '$lib/const.js'
+
+	const dateOptions = {
+        "24h": { label: "Dernier jour", start: "now-1d", end: "now", step: "1h"},
+        "7j": { label: "Dernière semaine", start: "now-7d", end: "now", step: "4h"},
+        "30j": { label: "Dernier mois", start: "now-30d", end: "now", step: "1d"},
+        "j0": { label: "Depuis le début", start: "2021-10-01", end: "now", step: "1d"}
+    };
+
+    const envOptions = [ "production", "secours", "recette" ];
+
+    export let since = DEFAULT_SINCE;
+	export let env = DEFAULT_ENV;
 
 	const statsTypes = [
 		{ query: "total_docs", type: "number" },
@@ -38,31 +51,13 @@
         pods_number: "Conteneurs"
     }
 
-	const dateOptions = [
-		{ label: "Dernier jour", start: "now-1d", end: "now", step: "1h"},
-		{ label: "Dernière heure", start: "now-1h", end: "now", step: "1m"},
-		{ label: "Dernière semaine", start: "now-7d", end: "now", step: "4h"},
-		{ label: "Dernier mois", start: "now-30d", end: "now", step: "1d"},
-		{ label: "Depuis le début", start: "2020-01-01T00:00:00", end: "now", step: "1d"},
-	]
-
-
-    const envOptions = [
-        { label: "Production", name: "production" },
-        { label: "Secours", name: "secours" },
-        { label: "Recette", name: "recette" },
-    ]
-
-    let dateSelected = dateOptions[0];
-	let envSelected = envOptions[0];
-
     let stats = {};
 
     let isLoading = {};
 
     let size = 50;
 
-    $: if (dateSelected || envSelected) {
+    $: if (since || env) {
         fetchData();
     }
 
@@ -71,7 +66,7 @@
             isLoading[statsType.query] = true;
     		fetch(
                 new Request(
-                    `https://monitor.judilibre.io/stats?query=${statsType.query}&date_start=${dateSelected.start}&date_end=${dateSelected.end}&date_interval=${dateSelected.step}&env=${envSelected.name}&size=${size}`,
+                    `https://monitor.judilibre.io/stats?query=${statsType.query}&date_start=${dateOptions[since].start}&date_end=${dateOptions[since].end}&date_interval=${dateOptions[since].step}&env=${env}&size=${size}`,
                     {
                         method: 'GET',
                         referer: 'https://stats.judilibre.io',
@@ -222,10 +217,10 @@
                                     <label class="fr-label" for="date">
                                         Plage de dates
                                     </label>
-                                    <select id="date" class="fr-select" bind:value={dateSelected}>
-                                        {#each dateOptions as dateOption}
-                                            <option value={dateOption}>
-                                                {dateOption.label}
+                                    <select id="date" class="fr-select" bind:value={since}>
+                                        {#each Object.keys(dateOptions) as d}
+                                            <option value={d}>
+                                                {dateOptions[d].label}
                                             </option>
                                         {/each}
                                     </select>
@@ -234,10 +229,10 @@
                                     <label class="fr-label" for="env">
                                         Environnement
                                     </label>
-                                    <select id="env" class="fr-select" bind:value={envSelected}>
-                                        {#each envOptions as envOption}
-                                            <option value={envOption}>
-                                                {envOption.label}
+                                    <select id="env" class="fr-select" bind:value={env}>
+                                        {#each envOptions as e}
+                                            <option value={e}>
+                                                {e.slice(0, 1).toUpperCase() + e.slice(1)}
                                             </option>
                                         {/each}
                                     </select>

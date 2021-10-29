@@ -90,8 +90,8 @@
             .padding(padding)
             .rotate((d) => d.text.length > 20 ? 0 : ~~(Math.random() * 2) * 90)
             .font(font)
-            .fontSize((d) =>  Math.floor(( Math.log(d.count+1) ** 1.5 / Math.log(maxWordCount+1) ** 1.5 ) * maxFontSizeApplied))
-            .fontWeight((d) => Math.floor((d.count / maxWordCount) * maxWeight))
+            .fontSize((d) =>  Math.floor(( Math.log(d.count+1) ** 3 / Math.log(maxWordCount+1) ** 3 ) * maxFontSizeApplied))
+            .fontWeight((d) => Math.floor(( Math.log(d.count+1) ** 3 / Math.log(maxWordCount+1) ** 3 ) * maxWeight))
             .on("end", draw);
         layout.start();
     } else {

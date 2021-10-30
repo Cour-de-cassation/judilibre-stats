@@ -21,8 +21,9 @@
   };
   // props
   export let words;
-  export let height = 900;
-  export let width = 1600;
+  export let viewboxHeight = 900;
+  export let viewboxWidth = 1600;
+  export let height = 250;
   export let font = '"Marianne"';
   export let maxFontSize = 250;
   export let maxWeight = 800;
@@ -44,7 +45,7 @@
     select("#wordcloud")
         .append("svg")
         // Responsive SVG needs these 2 attributes and no width and height attr.
-        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("viewBox", `0 0 ${viewboxWidth} ${viewboxHeight}`)
         .attr("width", "100%")
         .attr("height", "100%")
         // Class to make it responsive.
@@ -85,7 +86,7 @@
         const maxWordCount = sortedWords[0].count;
         const maxFontSizeApplied = maxFontSize * 10 /  sortedWords[0].text.length;
         layout = cloud()
-            .size([width, height])
+            .size([viewboxWidth, viewboxHeight])
             .words(sortedWords)
             .padding(padding)
             .rotate((d) => d.text.length > 20 ? 0 : ~~(Math.random() * 2) * 90)
@@ -105,7 +106,7 @@
   }
 </script>
 
-<div id="wordcloud" class:inactive={inactive} style="height: 100%;max-height: 250px;display: block; margin: auto;">
+<div id="wordcloud" class:inactive={inactive} style="height: 100%;max-height: {height || 250}px;display: block; margin: auto;">
     {#if (words && words.length === 0)}
         (pas de requête)
     {/if}

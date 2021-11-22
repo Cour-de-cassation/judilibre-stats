@@ -251,7 +251,7 @@
 
     const toD3words = (data) => {
         return Object.keys(data)
-            .filter(word => ((word.length>1)&&(word !== "chien")))
+            .filter(word => ((word.length>1)&&(! ["chien","téléphonie"].includes(word))))
             .map(word => {
                 return {
                     "text": word,

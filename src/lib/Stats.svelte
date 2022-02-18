@@ -133,7 +133,7 @@
         statsTypes.filter(s => s.query !== "uptime_details").forEach( async (statsType) => {
             isLoading[statsType.query] = true;
             if (statsType.query !== "uptime" ) {
-                const res = await fetch(`https://monitor.judilibre.io/stats?query=${statsType.query}&date_start=${dateOptions[since].start}&date_end=${dateOptions[since].end}&date_interval=${dateOptions[since].step}&env=${env}&size=${size}`);
+                const res = await fetch(`https://stats-api.judilibre.io/stats?query=${statsType.query}&date_start=${dateOptions[since].start}&date_end=${dateOptions[since].end}&date_interval=${dateOptions[since].step}&env=${env}&size=${size}`);
                 if (res.ok) {
                     const json = await res.json();
                     stats[statsType.query] = await json[statsType.query];

@@ -157,7 +157,9 @@
                     data: generateTimeseries().map((data) => {
                             const uptime = { date: data.dateFrom.toISOString(), dateInterval: dateInterval };
                             Object.keys(urls).forEach((envLabel) => {
-                                uptime[envLabel] = Math.round((Number.EPSILON + 1 - 1 / dateInterval * response[envLabel].map((issue) => {
+                                uptime[envLabel] = Math.round((Number.EPSILON + 1 - 1 / dateInterval * response[envLabel]
+                                    .filter((issue) => issue.title.includes("down") )
+                                    .map((issue) => {
                                         const issueStart = new Date(issue.created_at);
                                         const issueEnd = issue.closed_at && new Date(issue.closed_at) || new Date(Date.now());
                                         if ((data.dateTo < issueStart) || (data.dateFrom > issueEnd)) {

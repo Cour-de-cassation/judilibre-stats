@@ -1,10 +1,10 @@
 <script context="module">
 	export const prerender = false;
 	import { DEFAULT_ENV, DEFAULT_SINCE } from '$lib/const.js'
-	export async function load({ page }) {
+	export async function load({ url, params }) {
 		const props = {};
-		props.since = page.query.get("since") || DEFAULT_SINCE;
-		props.env = page.query.get("env") || DEFAULT_ENV;
+		props.since = params["since"] || DEFAULT_SINCE;
+		props.env = params["env"] || DEFAULT_ENV;
 		return { props };
 	}
 
@@ -20,19 +20,19 @@
 
 	$: if (since) {
 		if (since !== DEFAULT_SINCE) {
-			$page.query.set("since", since);
+			$page.url.searchParams.set("since", since);
 		} else {
-			$page.query.delete("since");
+			$page.url.searchParams.delete("since");
 		}
-		goto($page.query.toString() ? `${$page.path}?${$page.query.toString()}` : `${$page.path}`);
+		goto($page.url.searchParams.toString() ? `${$page.url.pathname}?${$page.url.searchParams.toString()}` : `${$page.url.pathname}`);
 	};
 	$: if (env) {
 		if (env !== DEFAULT_ENV) {
-			$page.query.set("env", env);
+			$page.url.searchParams.set("env", env);
 		} else {
-			$page.query.delete("env");
+			$page.url.searchParams.delete("env");
 		}
-		goto($page.query.toString() ? `${$page.path}?${$page.query.toString()}` : `${$page.path}`);
+		goto($page.url.searchParams.toString() ? `${$page.url.pathname}?${$page.url.searchParams.toString()}` : `${$page.url.pathname}`);
 	};
 
 </script>

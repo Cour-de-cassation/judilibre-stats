@@ -1,10 +1,11 @@
 <script context="module">
 	export const prerender = false;
 	import { DEFAULT_ENV, DEFAULT_SINCE } from '$lib/const.js'
-	export async function load({ url, params }) {
+	export async function load({ url }) {
 		const props = {};
-		props.since = params["since"] || DEFAULT_SINCE;
-		props.env = params["env"] || DEFAULT_ENV;
+		props.since = url.searchParams.get("since") || DEFAULT_SINCE;
+		props.env = url.searchParams.get("env") || DEFAULT_ENV;
+		console.log(props);
 		return { props };
 	}
 
@@ -19,6 +20,7 @@
 	export let env;
 
 	$: if (since) {
+		console.log("since",since,$page.url.searchParams.toString());
 		if (since !== DEFAULT_SINCE) {
 			$page.url.searchParams.set("since", since);
 		} else {
